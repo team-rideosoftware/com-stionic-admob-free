@@ -34,9 +34,9 @@ import isUndefined from 'lodash/isUndefined'
  * @ignore
  */
 export function exec(method, args) {
-  return new Promise((resolve, reject) => {
+  return new Promise(((resolve, reject) => {
     corodvaExec(resolve, reject, 'AdMob', method, args)
-  })
+  }))
 }
 
 /**
