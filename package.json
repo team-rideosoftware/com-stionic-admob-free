@@ -1,5 +1,5 @@
 {
-  "name": "cordova-plugin-admob-free",
+  "name": "com-stionic-admob-free",
   "version": "0.27.0",
   "description": "Cordova AdMob Plugin for Google AdMob",
   "scripts": {
@@ -21,14 +21,14 @@
     "lint:spaces": "lintspaces -n -t -d spaces *.* src/**/*.* tests/**/*.* examples/*/*.* examples/*/www/*.*"
   },
   "cordova": {
-    "id": "cordova-plugin-admob-free",
+    "id": "com-stionic-admob-free",
     "platforms": [
       "android",
       "ios"
     ]
   },
-  "homepage": "https://ratson.github.io/cordova-plugin-admob-free/",
-  "repository": "ratson/cordova-plugin-admob-free",
+  "homepage": "https://stionic.github.io/com-stionic-admob-free/",
+  "repository": "stionic/com-stionic-admob-free",
   "keywords": [
     "cordova",
     "admob",
@@ -42,7 +42,7 @@
     "admobpro"
   ],
   "tonicExampleFilename": "test.js",
-  "author": "Ratson",
+  "author": "stionic",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.4.5",
