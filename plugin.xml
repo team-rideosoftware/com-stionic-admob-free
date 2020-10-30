@@ -15,7 +15,7 @@
     <issue>https://github.com/stionic/com-stionic-admob-free/issues</issue>
 
     <engines>
-        <engine name="cordova" version=">=4.0" />
+        <engine name="cordova" version=">=9.0.0" />
     </engines>
 
     <js-module name="AdMob" src="www/admob.js">
@@ -27,7 +27,7 @@
 
     <platform name="android">
         <preference name="ANDROID_APP_ID" default="ca-app-pub-3940256099942544~3347511713"/>
-        <preference name="PLAY_SERVICES_VERSION" default="16.0.+"/>
+        <preference name="PLAY_SERVICES_VERSION" default="19.5.+"/>
 
         <config-file parent="/manifest/application" target="AndroidManifest.xml">
             <activity android:name="com.google.android.gms.ads.AdActivity"
@@ -66,6 +66,7 @@
 
     <platform name="ios">
         <preference name="IOS_APP_ID" default="ca-app-pub-3940256099942544~1458002511" />
+        <preference name="IOS_SDK_VERSION" default="~> 7.67"/>
 
         <config-file parent="GADApplicationIdentifier" target="*-Info.plist">
             <string>$IOS_APP_ID</string>
@@ -84,7 +85,7 @@
                 <source url="https://cdn.cocoapods.org/"/>
             </config>
             <pods>
-                <pod name="Google-Mobile-Ads-SDK" spec="~> 7.59" />
+                <pod name="Google-Mobile-Ads-SDK" spec="$IOS_SDK_VERSION" />
             </pods>
         </podspec>
     </platform>
