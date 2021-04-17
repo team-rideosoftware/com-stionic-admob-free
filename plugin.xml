@@ -67,9 +67,13 @@
     <platform name="ios">
         <preference name="IOS_APP_ID" default="ca-app-pub-3940256099942544~1458002511" />
         <preference name="IOS_SDK_VERSION" default="~> 7.67"/>
+        <preference name="IOS_SDK_TRANSPARENCY" default="This identifier will be used to deliver personalized ads to you."/>
 
         <config-file parent="GADApplicationIdentifier" target="*-Info.plist">
             <string>$IOS_APP_ID</string>
+        </config-file>
+        <config-file parent="NSUserTrackingUsageDescription" target="*-Info.plist">
+            <string>$IOS_SDK_TRANSPARENCY</string>
         </config-file>
 
         <config-file parent="/*" target="config.xml">

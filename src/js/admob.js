@@ -1,6 +1,6 @@
 import exec from 'cordova/exec'
 
-import { wrapCallbacks, translateOptions } from './utils'
+import { wrapCallbacks, translateOptions, exec as execUtil } from './utils'
 
 import { Banner } from './banner'
 import { Interstitial } from './interstitial'
@@ -77,6 +77,13 @@ export const interstitial = new Interstitial()
  * admob.rewardvideo.show()
  */
 export const rewardvideo = new RewardVideo()
+
+/**
+ * @returns {Promise} Excutaion result promise.
+ */
+export const requestIDFA = function () {
+  return execUtil('requestIDFA', [])
+}
 
 // Old APIs
 

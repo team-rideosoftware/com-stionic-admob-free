@@ -4,6 +4,8 @@
 #import "CDVAdMob.h"
 
 #import <GoogleMobileAds/GADExtras.h>
+#import <AppTrackingTransparency/AppTrackingTransparency.h>
+#import <AdSupport/AdSupport.h>
 
 @interface CDVAdMob()
 
@@ -384,6 +386,27 @@
     }
 
     [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+}
+
+- (void)requestIDFA:(CDVInvokedUrlCommand *)command {
+    NSLog(@"requestIDFA");
+
+    NSString *callbackId = command.callbackId;
+
+    if (@available(iOS 14, *)) {
+        [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
+            // Tracking authorization completed. Start loading ads here.
+            CDVPluginResult *pluginResult;
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsNSInteger:status];
+
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+        }];
+    } else {
+        CDVPluginResult *pluginResult;
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:false];
+
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    }
 }
 
 - (void) __cycleRewardVideo {
