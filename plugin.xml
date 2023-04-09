@@ -62,6 +62,7 @@
         <source-file src="src/android/CordovaEventBuilder.java" target-dir="src/name/ratson/cordova/admob" />
 
         <framework src="com.google.android.gms:play-services-ads:$PLAY_SERVICES_VERSION" />
+        <framework src="com.google.android.gms:play-services-base:18.2.0" />
     </platform>
 
     <platform name="ios">
