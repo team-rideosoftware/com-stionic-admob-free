@@ -1,6 +1,6 @@
 {
   "name": "com-stionic-admob-free",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Cordova AdMob Plugin for Google AdMob",
   "scripts": {
     "prepublish": "run-s clean build",
