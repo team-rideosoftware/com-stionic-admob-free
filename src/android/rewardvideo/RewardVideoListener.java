@@ -2,28 +2,31 @@ package name.ratson.cordova.admob.rewardvideo;
 
 import android.util.Log;
 
-import com.google.android.gms.ads.reward.RewardItem;
-import com.google.android.gms.ads.reward.RewardedVideoAdListener;
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.rewarded.RewardItem;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import name.ratson.cordova.admob.AbstractExecutor;
 
-class RewardVideoListener implements RewardedVideoAdListener {
+class RewardVideoListener extends FullScreenContentCallback {
     private final RewardVideoExecutor executor;
 
     RewardVideoListener(RewardVideoExecutor executor) {
         this.executor = executor;
     }
 
-    @Override
-    public void onRewardedVideoAdFailedToLoad(int errorCode) {
+    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
         synchronized (executor.rewardedVideoLock) {
             executor.isRewardedVideoLoading = false;
         }
 
         JSONObject data = new JSONObject();
+        int errorCode = loadAdError.getCode();
         try {
             data.put("error", errorCode);
             data.put("reason", AbstractExecutor.getErrorReason(errorCode));
@@ -34,19 +37,7 @@ class RewardVideoListener implements RewardedVideoAdListener {
         executor.fireAdEvent("admob.rewardvideo.events.LOAD_FAIL", data);
     }
 
-    @Override
-    public void onRewardedVideoAdLeftApplication() {
-        JSONObject data = new JSONObject();
-        try {
-            data.put("adType", executor.getAdType());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        executor.fireAdEvent("admob.rewardvideo.events.EXIT_APP", data);
-    }
-
-    @Override
-    public void onRewardedVideoAdLoaded() {
+    public void onAdLoaded() {
         synchronized (executor.rewardedVideoLock) {
             executor.isRewardedVideoLoading = false;
         }
@@ -59,22 +50,27 @@ class RewardVideoListener implements RewardedVideoAdListener {
     }
 
     @Override
-    public void onRewardedVideoAdOpened() {
+    public void onAdClicked() {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("adType", executor.getAdType());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        executor.fireAdEvent("admob.rewardvideo.events.EXIT_APP", data);
+    }
+
+    @Override
+    public void onAdShowedFullScreenContent() {
         executor.fireAdEvent("admob.rewardvideo.events.OPEN");
     }
 
     @Override
-    public void onRewardedVideoStarted() {
-        executor.fireAdEvent("admob.rewardvideo.events.START");
-    }
-
-    @Override
-    public void onRewardedVideoAdClosed() {
+    public void onAdDismissedFullScreenContent() {
         executor.fireAdEvent("admob.rewardvideo.events.CLOSE");
         executor.clearAd();
     }
 
-    @Override
     public void onRewarded(RewardItem reward) {
         JSONObject data = new JSONObject();
         try {
@@ -85,9 +81,5 @@ class RewardVideoListener implements RewardedVideoAdListener {
             e.printStackTrace();
         }
         executor.fireAdEvent("admob.rewardvideo.events.REWARD", data);
-    }
-
-    public void onRewardedVideoCompleted() {
-        executor.fireAdEvent("admob.rewardvideo.events.COMPLETE");
     }
 }

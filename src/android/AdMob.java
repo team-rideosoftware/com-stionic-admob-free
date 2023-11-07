@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.google.ads.mediation.admob.AdMobAdapter;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -22,7 +24,9 @@ import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import name.ratson.cordova.admob.banner.BannerExecutor;
 import name.ratson.cordova.admob.interstitial.InterstitialExecutor;
@@ -101,14 +105,6 @@ public class AdMob extends CordovaPlugin {
             JSONObject options = inputs.optJSONObject(0);
             result = interstitialExecutor.prepareAd(options, callbackContext);
 
-        } else if (Actions.CREATE_INTERSTITIAL.equals(action)) {
-            JSONObject options = inputs.optJSONObject(0);
-            result = interstitialExecutor.createAd(options, callbackContext);
-
-        } else if (Actions.REQUEST_INTERSTITIAL.equals(action)) {
-            JSONObject options = inputs.optJSONObject(0);
-            result = interstitialExecutor.requestAd(options, callbackContext);
-
         } else if (Actions.SHOW_INTERSTITIAL.equals(action)) {
             boolean show = inputs.optBoolean(0);
             result = interstitialExecutor.showAd(show, callbackContext);
@@ -150,15 +146,22 @@ public class AdMob extends CordovaPlugin {
 
     public AdRequest buildAdRequest() {
         AdRequest.Builder builder = new AdRequest.Builder();
+        List<String> testDeviceIds = new ArrayList<>();
         if (config.isTesting || isRunningInTestLab()) {
-            builder = builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR).addTestDevice(getDeviceId());
+            testDeviceIds.add(getDeviceId());
         }
 
         if (config.testDeviceList != null) {
             Iterator<String> iterator = config.testDeviceList.iterator();
             while (iterator.hasNext()) {
-                builder = builder.addTestDevice(iterator.next());
+                testDeviceIds.add(iterator.next());
             }
+        }
+
+        if (!testDeviceIds.isEmpty()) {
+            RequestConfiguration configuration =
+                    new RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build();
+            MobileAds.setRequestConfiguration(configuration);
         }
 
         Bundle bundle = new Bundle();
@@ -176,28 +179,6 @@ public class AdMob extends CordovaPlugin {
         }
         builder = builder.addNetworkExtrasBundle(AdMobAdapter.class, bundle);
 
-        if (config.gender != null) {
-            if ("male".compareToIgnoreCase(config.gender) != 0) {
-                builder.setGender(AdRequest.GENDER_MALE);
-            } else if ("female".compareToIgnoreCase(config.gender) != 0) {
-                builder.setGender(AdRequest.GENDER_FEMALE);
-            } else {
-                builder.setGender(AdRequest.GENDER_UNKNOWN);
-            }
-        }
-        if (config.location != null) {
-            builder.setLocation(config.location);
-        }
-        if ("yes".equals(config.forFamily)) {
-            builder.setIsDesignedForFamilies(true);
-        } else if ("no".equals(config.forFamily)) {
-            builder.setIsDesignedForFamilies(false);
-        }
-        if ("yes".equals(config.forChild)) {
-            builder.tagForChildDirectedTreatment(true);
-        } else if ("no".equals(config.forChild)) {
-            builder.tagForChildDirectedTreatment(false);
-        }
         if (config.contentURL != null) {
             builder.setContentUrl(config.contentURL);
         }

@@ -9,8 +9,6 @@ final class Actions {
     static final String DESTROY_BANNER = "destroyBannerView";
     static final String REQUEST_AD = "requestAd";
     static final String SHOW_AD = "showAd";
-    static final String CREATE_INTERSTITIAL = "createInterstitialView";
-    static final String REQUEST_INTERSTITIAL = "requestInterstitialAd";
     static final String PREPARE_INTERSTITIAL = "prepareInterstitial";
     static final String SHOW_INTERSTITIAL = "showInterstitialAd";
     static final String IS_INTERSTITIAL_READY = "isInterstitialReady";

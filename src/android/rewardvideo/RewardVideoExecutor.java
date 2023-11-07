@@ -3,10 +3,13 @@ package name.ratson.cordova.admob.rewardvideo;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.ads.mediation.admob.AdMobAdapter;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.reward.RewardedVideoAd;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.rewarded.RewardedAd;
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -20,7 +23,7 @@ public class RewardVideoExecutor extends AbstractExecutor {
     /**
      * RewardVideo
      */
-    private RewardedVideoAd rewardedVideoAd;
+    private RewardedAd mRewardedVideoAd;
     boolean isRewardedVideoLoading = false;
     final Object rewardedVideoLock = new Object();
 
@@ -44,9 +47,8 @@ public class RewardVideoExecutor extends AbstractExecutor {
                 CordovaInterface cordova = plugin.cordova;
                 clearAd();
 
-                rewardedVideoAd = MobileAds.getRewardedVideoAdInstance(cordova.getActivity());
-                rewardedVideoAd.setRewardedVideoAdListener(new RewardVideoListener(RewardVideoExecutor.this));
                 Log.w("rewardedvideo", plugin.config.getRewardedVideoAdUnitId());
+                RewardVideoListener listener = new RewardVideoListener(RewardVideoExecutor.this);
 
                 synchronized (rewardedVideoLock) {
                     if (!isRewardedVideoLoading) {
@@ -56,7 +58,20 @@ public class RewardVideoExecutor extends AbstractExecutor {
                         AdRequest adRequest = new AdRequest.Builder()
                                 .addNetworkExtrasBundle(AdMobAdapter.class, extras)
                                 .build();
-                        rewardedVideoAd.loadAd(plugin.config.getRewardedVideoAdUnitId(), adRequest);
+                        RewardedAd.load(cordova.getContext(), plugin.config.getRewardedVideoAdUnitId(), adRequest, new RewardedAdLoadCallback() {
+                            @Override
+                            public void onAdLoaded(@NonNull RewardedAd rewardedAd) {
+                                mRewardedVideoAd = rewardedAd;
+                                mRewardedVideoAd.setFullScreenContentCallback(listener);
+                                listener.onAdLoaded();
+                            }
+
+                            @Override
+                            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                                mRewardedVideoAd = null;
+                                listener.onAdFailedToLoad(loadAdError);
+                            }
+                        });
                         delayCallback.success();
                     }
                 }
@@ -66,15 +81,15 @@ public class RewardVideoExecutor extends AbstractExecutor {
     }
 
     public void clearAd() {
-        if (rewardedVideoAd == null) {
+        if (mRewardedVideoAd == null) {
             return;
         }
-        rewardedVideoAd.setRewardedVideoAdListener(null);
-        rewardedVideoAd = null;
+        mRewardedVideoAd.setFullScreenContentCallback(null);
+        mRewardedVideoAd = null;
     }
 
     public PluginResult showAd(final boolean show, final CallbackContext callbackContext) {
-        if (rewardedVideoAd == null) {
+        if (mRewardedVideoAd == null) {
             return new PluginResult(PluginResult.Status.ERROR, "rewardedVideoAd is null, call createRewardVideo first.");
         }
         CordovaInterface cordova = plugin.cordova;
@@ -83,11 +98,11 @@ public class RewardVideoExecutor extends AbstractExecutor {
             @Override
             public void run() {
 
-                if (rewardedVideoAd instanceof RewardedVideoAd) {
-                    RewardedVideoAd rvad = rewardedVideoAd;
-                    if (rvad.isLoaded()) {
-                        rvad.show();
-                    }
+                if (mRewardedVideoAd != null) {
+                    mRewardedVideoAd.show(cordova.getActivity(), rewardItem -> {
+                        RewardVideoListener listener = new RewardVideoListener(RewardVideoExecutor.this);
+                        listener.onRewarded(rewardItem);
+                    });
                 }
 
                 if (callbackContext != null) {
@@ -110,7 +125,7 @@ public class RewardVideoExecutor extends AbstractExecutor {
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (rewardedVideoAd != null && rewardedVideoAd.isLoaded()) {
+                if (mRewardedVideoAd != null) {
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
                 } else {
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, false));
