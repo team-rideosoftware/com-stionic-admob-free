@@ -68,7 +68,7 @@
     <platform name="ios">
         <preference name="IOS_APP_ID" default="ca-app-pub-xxx~yyy" />
         <preference name="IOS_PROMISESOBJC_VERSION" default="~> 1.2"/>
-        <preference name="IOS_SDK_VERSION" default="~> 7.69"/>
+        <preference name="IOS_SDK_VERSION" default="~> 11.3.0"/>
         <preference name="IOS_SDK_TRANSPARENCY" default="This identifier will be used to deliver personalized ads to you."/>
 
         <config-file parent="GADApplicationIdentifier" target="*-Info.plist">
